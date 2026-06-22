@@ -1,0 +1,36 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  nightly-build:
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/dev'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build nightly
+        run: |
+          $date = Get-Date -Format "yyyyMMdd"
+          dotnet build src/Corex.sln `
+            --configuration Release `
+            /p:Version="0.0.0-nightly.$date"
+        shell: powershell
+
+      - name: Run all tests
+        run: dotnet test src/Corex.Tests/Corex.Tests.csproj --configuration Release
+
+      - name: Upload nightly artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: corex-nightly-${{ github.run_number }}
+          path: '**/publish/**'
+          retention-days: 7

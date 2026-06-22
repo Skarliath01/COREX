@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Corex.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Corex — Your PC. Your Core. Unleashed.">
+    <Grid>
+        <TextBlock
+            Text="Corex"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontSize="32" />
+    </Grid>
+</Window>

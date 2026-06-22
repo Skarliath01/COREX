@@ -5,7 +5,7 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    COREX DESKTOP APP                        │
-│                  C# 13 + WinUI 3 (WASDK)                   │
+│            C# 13 + .NET 10 LTS + WinUI 3 (WASDK)            │
 ├──────────────┬──────────────┬──────────────┬───────────────┤
 │   UI Layer   │ Core Layer   │ Engine Layer │ Native Layer  │
 │  (WinUI 3)   │  (C# Logic)  │  (C# + C++)  │  (C++/WinAPI) │
