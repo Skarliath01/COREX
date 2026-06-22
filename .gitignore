@@ -480,3 +480,10 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Corex — certificats et secrets
+*.p12
+ev_cert.*
+appsettings.local.json
+backend/.env
+backend/.env.local
