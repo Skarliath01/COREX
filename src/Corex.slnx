@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Corex.App/Corex.App.csproj" />
+  <Project Path="Corex.Core/Corex.Core.csproj" />
+  <Project Path="Corex.Engine/Corex.Engine.csproj" />
+  <Project Path="Corex.Tests/Corex.Tests.csproj" />
+</Solution>

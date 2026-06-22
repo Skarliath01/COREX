@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, staging, main]
+  push:
+    branches: [dev]
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  SOLUTION: 'src/Corex.sln'
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet
+        run: dotnet restore ${{ env.SOLUTION }}
+
+      - name: Build Debug
+        run: dotnet build ${{ env.SOLUTION }} --configuration Debug --no-restore
+
+      - name: Run Unit Tests
+        run: |
+          dotnet test src/Corex.Tests/Corex.Tests.csproj `
+            --configuration Debug `
+            --no-build `
+            --filter "Category=Unit" `
+            --logger "trx;LogFileName=unit-results.trx" `
+            --collect:"XPlat Code Coverage"
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: '**/*.trx'
+
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: '**/coverage.cobertura.xml'
+
+  static-analysis:
+    name: Static Analysis
+    runs-on: windows-latest
+    needs: build-and-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Run Roslyn Analyzers
+        run: |
+          dotnet build ${{ env.SOLUTION }} `
+            --configuration Debug `
+            /p:TreatWarningsAsErrors=true `
+            /p:EnableNETAnalyzers=true `
+            /p:AnalysisLevel=latest
+
+      - name: Check formatting
+        run: dotnet format ${{ env.SOLUTION }} --verify-no-changes --severity warn
