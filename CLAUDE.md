@@ -54,14 +54,14 @@ feature/* fix/* hotfix/*   ←  TOUJOURS depuis `dev`
 ## Workflow AI — Séquence par feature
 
 ```
-gstack /office-hours        →  question ouverte multi-rôle (CEO + archi + QA)
-gstack /plan-eng-review     →  revue architecture avant d'implémenter
-gstack /plan-ceo-review     →  décision produit / priorisation
-PAUL Plan                   →  ancrer la session AVANT tout code (obligatoire)
-Context7                    →  doc officielle avant toute API ou NuGet
+gstack /office-hours        →  cadrage, vision, risques (début de projet / sprint)
+gstack /plan-ceo-review     →  décision produit (optionnel — si arbitrage scope nécessaire)
+gstack /plan-eng-review     →  design technique de la feature (avant chaque feature)
+PAUL Plan                   →  ancrage session
+Context7                    →  doc APIs
 Superpowers TDD             →  Clarify → Plan → Test → Implement → Verify
-Headroom (70%)              →  déclenche PAUL Unify automatiquement
-PAUL Unify + Memory         →  synthèse session + .claude/ + sync mémoire
+Headroom (70%)              →  Unify automatique
+PAUL Unify + Memory         →  clôture
 ```
 
 Template PAUL Plan : `État backlog [F01 done / F02 en cours] · Décisions récentes [...] · Objectif session [Feature XX]`
@@ -72,8 +72,8 @@ Template PAUL Plan : `État backlog [F01 done / F02 en cours] · Décisions réc
 
 | Couche | Technologie |
 |--------|-------------|
-| UI | WinUI 3 (WASDK) + C# 13, MVVM — `Corex.App/` |
-| Core | C# 13, records immuables, services — `Corex.Core/` |
+| UI | WinUI 3 (WASDK) + C# 13 / .NET 10 LTS, MVVM — `Corex.App/` |
+| Core | C# 13 / .NET 10 LTS, records immuables, services — `Corex.Core/` |
 | Engine | C# + C++/P/Invoke, WMI, Registry — `Corex.Engine/` |
 | Native | C++ DLL, NVAPI + ADL + IGCL — `Corex.Native/` |
 | Backend | Node.js + Express + PostgreSQL — `backend/` |
