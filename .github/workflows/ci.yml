@@ -32,8 +32,19 @@ jobs:
       - name: Restore NuGet
         run: dotnet restore ${{ env.SOLUTION }}
 
-      - name: Build Debug
-        run: dotnet build ${{ env.SOLUTION }} --configuration Debug --no-restore
+      - name: Build Debug (Core, Engine, Tests)
+        run: |
+          dotnet build src/Corex.Core/Corex.Core.csproj --configuration Debug --no-restore
+          dotnet build src/Corex.Engine/Corex.Engine.csproj --configuration Debug --no-restore
+          dotnet build src/Corex.Tests/Corex.Tests.csproj --configuration Debug --no-restore
+
+      - name: Build Debug (Corex.App — WinUI 3)
+        run: |
+          msbuild 'src\Corex.App\Corex.App.csproj' `
+            /t:Build `
+            /p:Configuration=Debug `
+            /p:Platform=x64 `
+            /p:RestorePackages=false
 
       - name: Run Unit Tests
         run: |
@@ -70,13 +81,36 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet (App)
+        run: dotnet restore ${{ env.SOLUTION }}
+
       - name: Run Roslyn Analyzers
         run: |
-          dotnet build ${{ env.SOLUTION }} `
-            --configuration Debug `
+          dotnet build src/Corex.Core/Corex.Core.csproj `
+            --configuration Debug --no-restore `
             /p:TreatWarningsAsErrors=true `
             /p:EnableNETAnalyzers=true `
             /p:AnalysisLevel=latest
+          dotnet build src/Corex.Engine/Corex.Engine.csproj `
+            --configuration Debug --no-restore `
+            /p:TreatWarningsAsErrors=true `
+            /p:EnableNETAnalyzers=true `
+            /p:AnalysisLevel=latest
+          dotnet build src/Corex.Tests/Corex.Tests.csproj `
+            --configuration Debug --no-restore `
+            /p:TreatWarningsAsErrors=true `
+            /p:EnableNETAnalyzers=true `
+            /p:AnalysisLevel=latest
+          msbuild 'src\Corex.App\Corex.App.csproj' `
+            /t:Build `
+            /p:Configuration=Debug `
+            /p:Platform=x64 `
+            /p:TreatWarningsAsErrors=true `
+            /p:EnableNETAnalyzers=true `
+            /p:RestorePackages=false
 
       - name: Check formatting
         run: dotnet format ${{ env.SOLUTION }} --verify-no-changes --severity warn
