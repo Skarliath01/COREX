@@ -3,27 +3,31 @@
 ## Architecture des couches
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  COUCHE DÉCISION          gstack                    │
-│  /office-hours · /plan-eng-review · /plan-ceo-review│
-└────────────────────────┬────────────────────────────┘
-                         │
-┌────────────────────────▼────────────────────────────┐
-│  COUCHE SESSION          PAUL  ←──────  Claude Memory│
-│  Plan → Apply → Unify         (persistance cross-    │
-│                                session)              │
-└────────────────────────┬────────────────────────────┘
-                         │
-┌────────────────────────▼────────────────────────────┐
-│  COUCHE CONTEXTE         Headroom + Context7         │
-│  Headroom : surveille 70% saturation                │
-│  Context7 : doc officielle NuGet/API avant code     │
-└────────────────────────┬────────────────────────────┘
-                         │
-┌────────────────────────▼────────────────────────────┐
-│  COUCHE EXÉCUTION        Superpowers (TDD)           │
-│  Clarify → Plan → Test → Implement → Verify         │
-└─────────────────────────────────────────────────────┘
+/office-hours        →  vision, risques, positionnement
+
+↓
+
+/plan-eng-review     →  design technique feature
+
+↓
+
+PAUL Plan            →  ancrage session (décisions intégrées)
+
+↓
+
+Context7             →  doc officielle APIs
+
+↓
+
+Superpowers TDD      →  Clarify → Plan → Test → Implement → Verify
+
+↓
+
+Headroom (70%)       →  déclenche Unify si saturation
+
+↓
+
+PAUL Unify + Memory  →  synthèse + persistance
 ```
 
 **Règle absolue : ne jamais sauter une couche.**
@@ -33,106 +37,43 @@ Coder sans PAUL Plan = drift. Utiliser une API sans Context7 = hallucination. Ex
 
 ## Séquence complète par feature
 
-### 1 · gstack — Décision architecture
-**Quand :** début de feature, choix structurant, pivot.
-**Commandes :**
-- `/office-hours` → question ouverte multi-rôle (CEO + archi + QA simultané)
-- `/plan-eng-review` → revue design avant d'implémenter
-- `/plan-ceo-review` → décision produit / priorisation backlog
+### 1 · gstack /office-hours — Cadrage projet
+**Quand :** début de projet, début de sprint, ou quand la vision dérive.
+**Rôle :** question ouverte multi-rôle (CEO + archi + QA simultané) —
+élucider le produit, valider le positionnement, identifier les risques macro.
+**Avant toute feature, avant tout /plan-eng-review.**
 
-**Limite :** 1–2 rôles max par session — au-delà, réponses trop génériques.
+### 2 · gstack /plan-ceo-review — Décision produit
+**Quand :** arbitrage priorisation backlog, pivot, décision scope V1/V2. Optionnel.
+**Rôle :** lens CEO — coût / valeur / timing.
 
-**Exemple Corex :**
-```
-/plan-eng-review : "Je veux détecter le GPU via WMI + NVAPI.
-Fallback si NVAPI indisponible : WMI seul.
-IHardwareDetector est-elle bien découpée pour mocker en tests ?"
-```
+### 3 · gstack /plan-eng-review — Revue architecture
+**Quand :** après /office-hours, juste avant d'implémenter une feature.
+**Rôle :** valider le design technique précis de la feature —
+interfaces, patterns, edge cases, thread-safety.
 
----
-
-### 2 · PAUL Plan — Ancrage session
-**Quand :** TOUJOURS en premier avant d'écrire du code. Sans exception.
-
-**Template à coller en début de session Claude Code :**
-```
-PAUL context load — Corex by Altysin
-État backlog : terminé [F01], en cours [F02], bloqué []
-Décisions récentes : [HardwareProfile = record immuable · WMI cache 60min]
-Objectif session : [Feature XX — description précise]
-Contrainte active : snapshot obligatoire avant toute modification système
-```
-
-**Rôle :** empêche le context drift — si la session dévie, revenir au Plan.
-
----
-
-### 3 · Claude Memory — Persistance cross-session
-**Quand :** automatique au démarrage. Manuel quand une décision clé doit survivre.
-
-**Exemples de ce qui doit être mémorisé :**
-- Conventions actées (`HardwareProfile` = record immuable)
-- Décisions d'architecture (`WmiCache` = singleton, durée 60 min)
-- Anti-patterns découverts (`ManagementObjectSearcher` doit être dans `using`)
-
-**En fin de session :** demander explicitement `"mémorise les décisions de cette session"`.
-
----
-
-### 4 · Headroom — Garde-fou contexte
-**Quand :** passif — surveille automatiquement. Actif à 70% de saturation.
-
-**Comportement à 70% :**
-1. Stopper l'implémentation en cours
-2. Déclencher PAUL Unify immédiatement
-3. Sauvegarder l'état dans `.claude/backlog.md`
-4. Ouvrir une nouvelle session avec PAUL Plan rechargé
-
-**Signe que Headroom devrait sonner :** les réponses deviennent moins précises, le contexte des décisions précédentes semble oublié.
-
----
+### 4 · PAUL Plan — Ancrage session
+**Quand :** après gstack, TOUJOURS avant d'écrire du code.
+Template :
+  PAUL context load — Corex by Altysin
+  État backlog : terminé [], en cours [Fxx], bloqué []
+  Décisions récentes : [issues from /office-hours + /plan-eng-review]
+  Objectif session : [Feature XX]
+  Contrainte active : snapshot obligatoire avant toute modification système
 
 ### 5 · Context7 — Documentation officielle
-**Quand :** AVANT d'utiliser toute API, NuGet ou feature du framework.
-**Jamais** écrire du code sur une API sans avoir chargé sa doc.
-
-**Exemples Corex :**
-```
-# Avant d'implémenter HardwareDetector
-use context7 → System.Management (ManagementObjectSearcher, WQL syntax)
-use context7 → CommunityToolkit.Mvvm (ObservableProperty, RelayCommand)
-use context7 → WinUI3 NavigationView (pour Corex.App)
-use context7 → xUnit (Trait, Theory, InlineData)
-```
-
-**Pourquoi :** élimine les hallucinations d'API. Une signature inventée = build cassé + debug inutile.
-
----
+**Quand :** après PAUL Plan, avant d'utiliser toute API ou NuGet.
 
 ### 6 · Superpowers TDD — Exécution
-**Quand :** APRÈS PAUL Plan + Context7. Jamais avant.
+**Quand :** après Context7. Cycle : Clarify → Plan → Test → Implement → Verify.
 
-**Cycle obligatoire — dans cet ordre strict :**
+### 7 · Headroom — Garde-fou contexte
+**Passif.** Déclenche PAUL Unify automatiquement à 70% saturation.
 
-```
-CLARIFY   →  Poser toutes les questions ambiguës AVANT de coder
-PLAN      →  Lister les classes, interfaces, méthodes à créer
-TEST      →  Écrire les tests xUnit complets (rouges au premier run)
-IMPLEMENT →  Code minimal qui fait passer les tests — rien de plus
-VERIFY    →  dotnet test vert + dotnet format --verify-no-changes
-```
-
-**Exemple Corex — Feature F01 HardwareDetector :**
-```
-CLARIFY : "Le GPU intégré Intel doit-il être détecté en même temps que le GPU dédié NVIDIA ?"
-PLAN    : IHardwareDetector + HardwareDetectionService + WmiQuery + CpuInfo/GpuInfo/RamInfo/StorageInfo
-TEST    : DetectGpu_OnNvidiaCard_ReturnsNvidiaVendor · DetectGpu_OnIntelIntegrated_ReturnsIntelVendor
-IMPLEMENT : ManagementObjectSearcher avec using + cache Lazy<HardwareProfile>
-VERIFY  : dotnet test --filter "Category=Unit" → vert
-```
+### 8 · PAUL Unify + Claude Memory — Clôture
+**Quand :** fin de session volontaire OU Headroom à 70%.
 
 ---
-
 ## PAUL Unify — Clôture de session
 
 **Déclenché par :** fin de session volontaire OU Headroom à 70%.
