@@ -27,7 +27,7 @@ Décision    Stabilité     Exécution
 ## Stack technique
 
 ```
-App desktop    : C# 13 + WinUI 3 (WASDK)  — Win 10 22H2 minimum
+App desktop    : C# 13 + .NET 10 LTS + WinUI 3 (WASDK)  — Win 10 22H2 minimum
 Bas niveau     : C++ / P/Invoke pour WMI, Registry, WinAPI, GPU APIs
 Installeur     : Inno Setup 6
 Signature      : Certificat EV Authenticode (obligatoire dès V1)

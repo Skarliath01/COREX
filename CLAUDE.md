@@ -72,8 +72,8 @@ Template PAUL Plan : `État backlog [F01 done / F02 en cours] · Décisions réc
 
 | Couche | Technologie |
 |--------|-------------|
-| UI | WinUI 3 (WASDK) + C# 13, MVVM — `Corex.App/` |
-| Core | C# 13, records immuables, services — `Corex.Core/` |
+| UI | WinUI 3 (WASDK) + C# 13 / .NET 10 LTS, MVVM — `Corex.App/` |
+| Core | C# 13 / .NET 10 LTS, records immuables, services — `Corex.Core/` |
 | Engine | C# + C++/P/Invoke, WMI, Registry — `Corex.Engine/` |
 | Native | C++ DLL, NVAPI + ADL + IGCL — `Corex.Native/` |
 | Backend | Node.js + Express + PostgreSQL — `backend/` |

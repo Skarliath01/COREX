@@ -1,207 +1,190 @@
-# Corex — Workflow gstack → PAUL → Superpowers
+# Corex — Workflow orchestration 6 outils
 
-## Principe
+## Architecture des couches
 
 ```
-gstack   →   PAUL/GSD   →   Superpowers
-Décision      Stabilité      Exécution
-"quoi faire"  "ne pas        "comment faire"
-              dériver"
+┌─────────────────────────────────────────────────────┐
+│  COUCHE DÉCISION          gstack                    │
+│  /office-hours · /plan-eng-review · /plan-ceo-review│
+└────────────────────────┬────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────┐
+│  COUCHE SESSION          PAUL  ←──────  Claude Memory│
+│  Plan → Apply → Unify         (persistance cross-    │
+│                                session)              │
+└────────────────────────┬────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────┐
+│  COUCHE CONTEXTE         Headroom + Context7         │
+│  Headroom : surveille 70% saturation                │
+│  Context7 : doc officielle NuGet/API avant code     │
+└────────────────────────┬────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────┐
+│  COUCHE EXÉCUTION        Superpowers (TDD)           │
+│  Clarify → Plan → Test → Implement → Verify         │
+└─────────────────────────────────────────────────────┘
 ```
 
-**Ne jamais sauter une couche.** Coder sans avoir décidé quoi faire = dette. Décider sans ancrer l'état = drift. Exécuter sans plan = régression.
+**Règle absolue : ne jamais sauter une couche.**
+Coder sans PAUL Plan = drift. Utiliser une API sans Context7 = hallucination. Exécuter sans Clarify = régression.
 
 ---
 
-## Couche 1 — gstack (Décision)
+## Séquence complète par feature
 
-### Quand l'utiliser
-- Avant d'attaquer un nouveau module
-- Quand une décision d'architecture a des implications long terme
-- Quand tu hésites entre deux approches techniques
-- Avant de changer la priorité d'une feature du backlog
+### 1 · gstack — Décision architecture
+**Quand :** début de feature, choix structurant, pivot.
+**Commandes :**
+- `/office-hours` → question ouverte multi-rôle (CEO + archi + QA simultané)
+- `/plan-eng-review` → revue design avant d'implémenter
+- `/plan-ceo-review` → décision produit / priorisation backlog
 
-### Commandes clés
+**Limite :** 1–2 rôles max par session — au-delà, réponses trop génériques.
 
+**Exemple Corex :**
 ```
-/plan-eng-review    → Revue d'architecture — "Est-ce que mon design tient ?"
-/plan-ceo-review    → Décision produit — "Est-ce que cette feature vaut le coût ?"
-/office-hours       → Question ouverte multi-rôle (CEO + archi + QA simultané)
+/plan-eng-review : "Je veux détecter le GPU via WMI + NVAPI.
+Fallback si NVAPI indisponible : WMI seul.
+IHardwareDetector est-elle bien découpée pour mocker en tests ?"
 ```
-
-### Exemple Corex
-
-```
-Session gstack pour démarrer M1 :
-→ /plan-eng-review : "Je veux détecter le GPU via WMI + NVAPI en C#.
-   Mon fallback si NVAPI indisponible est WMI uniquement.
-   Est-ce que l'interface IHardwareDetector est bien découpée ?"
-
-Résultat attendu :
-- Validation ou refactoring de l'interface
-- Identification des edge cases (GPU Intel + NVIDIA en même temps ?)
-- Décision sur le cache (durée, invalidation)
-```
-
-### Limite gstack
-
-Chaque rôle gstack injecte ses propres prompts — activer trop de rôles simultanément consomme 10K+ tokens avant qu'une ligne de code soit écrite. Rester ciblé : 1–2 rôles max par session.
 
 ---
 
-## Couche 2 — PAUL (Stabilité)
+### 2 · PAUL Plan — Ancrage session
+**Quand :** TOUJOURS en premier avant d'écrire du code. Sans exception.
 
-### Quand l'utiliser
-- Au début de chaque session de dev pour recharger l'état
-- Quand une longue session dérive de l'objectif initial
-- Après une pause de plusieurs jours
-- Quand les décisions s'accumulent et le contexte devient flou
-
-### Ce que PAUL ancre pour Corex
-
-```
-État courant du backlog (features terminées / en cours / bloquées)
-Décisions d'architecture prises (ex: "on utilise records immuables pour HardwareProfile")
-Contraintes actives (ex: "timer resolution classé Expert, double confirmation requise")
-Objectif de la session en cours
-```
-
-### Template de prompt PAUL pour démarrer une session
-
+**Template à coller en début de session Claude Code :**
 ```
 PAUL context load — Corex by Altysin
+État backlog : terminé [F01], en cours [F02], bloqué []
+Décisions récentes : [HardwareProfile = record immuable · WMI cache 60min]
+Objectif session : [Feature XX — description précise]
+Contrainte active : snapshot obligatoire avant toute modification système
+```
 
-État backlog :
-- Features terminées : [01, 02]
-- En cours : [03 - Snapshot service]
-- Bloqué : []
+**Rôle :** empêche le context drift — si la session dévie, revenir au Plan.
 
-Décisions récentes :
-- HardwareProfile = record immuable (pas de mutation)
-- WMI cache 60min, invalidation manuelle uniquement
-- Snapshot stocké en JSON GZip dans %APPDATA%\Altysin\Corex\Snapshots\
+---
 
-Objectif session aujourd'hui :
-- Finir SnapshotService avec rollback sélectif
-- Écrire les tests unitaires correspondants
+### 3 · Claude Memory — Persistance cross-session
+**Quand :** automatique au démarrage. Manuel quand une décision clé doit survivre.
 
-Contrainte active :
-- Toute modification système = snapshot AVANT, sans exception
+**Exemples de ce qui doit être mémorisé :**
+- Conventions actées (`HardwareProfile` = record immuable)
+- Décisions d'architecture (`WmiCache` = singleton, durée 60 min)
+- Anti-patterns découverts (`ManagementObjectSearcher` doit être dans `using`)
+
+**En fin de session :** demander explicitement `"mémorise les décisions de cette session"`.
+
+---
+
+### 4 · Headroom — Garde-fou contexte
+**Quand :** passif — surveille automatiquement. Actif à 70% de saturation.
+
+**Comportement à 70% :**
+1. Stopper l'implémentation en cours
+2. Déclencher PAUL Unify immédiatement
+3. Sauvegarder l'état dans `.claude/backlog.md`
+4. Ouvrir une nouvelle session avec PAUL Plan rechargé
+
+**Signe que Headroom devrait sonner :** les réponses deviennent moins précises, le contexte des décisions précédentes semble oublié.
+
+---
+
+### 5 · Context7 — Documentation officielle
+**Quand :** AVANT d'utiliser toute API, NuGet ou feature du framework.
+**Jamais** écrire du code sur une API sans avoir chargé sa doc.
+
+**Exemples Corex :**
+```
+# Avant d'implémenter HardwareDetector
+use context7 → System.Management (ManagementObjectSearcher, WQL syntax)
+use context7 → CommunityToolkit.Mvvm (ObservableProperty, RelayCommand)
+use context7 → WinUI3 NavigationView (pour Corex.App)
+use context7 → xUnit (Trait, Theory, InlineData)
+```
+
+**Pourquoi :** élimine les hallucinations d'API. Une signature inventée = build cassé + debug inutile.
+
+---
+
+### 6 · Superpowers TDD — Exécution
+**Quand :** APRÈS PAUL Plan + Context7. Jamais avant.
+
+**Cycle obligatoire — dans cet ordre strict :**
+
+```
+CLARIFY   →  Poser toutes les questions ambiguës AVANT de coder
+PLAN      →  Lister les classes, interfaces, méthodes à créer
+TEST      →  Écrire les tests xUnit complets (rouges au premier run)
+IMPLEMENT →  Code minimal qui fait passer les tests — rien de plus
+VERIFY    →  dotnet test vert + dotnet format --verify-no-changes
+```
+
+**Exemple Corex — Feature F01 HardwareDetector :**
+```
+CLARIFY : "Le GPU intégré Intel doit-il être détecté en même temps que le GPU dédié NVIDIA ?"
+PLAN    : IHardwareDetector + HardwareDetectionService + WmiQuery + CpuInfo/GpuInfo/RamInfo/StorageInfo
+TEST    : DetectGpu_OnNvidiaCard_ReturnsNvidiaVendor · DetectGpu_OnIntelIntegrated_ReturnsIntelVendor
+IMPLEMENT : ManagementObjectSearcher avec using + cache Lazy<HardwareProfile>
+VERIFY  : dotnet test --filter "Category=Unit" → vert
 ```
 
 ---
 
-## Couche 3 — Superpowers (Exécution)
+## PAUL Unify — Clôture de session
 
-### Process Superpowers — toujours dans cet ordre
+**Déclenché par :** fin de session volontaire OU Headroom à 70%.
 
+**Ce que Unify produit :**
+- Résumé des décisions prises dans la session
+- Mise à jour `.claude/backlog.md` (features terminées / en cours)
+- Liste des points ouverts pour la prochaine session
+- Mémorisation via Claude Memory
+
+**Template Unify :**
 ```
-1. CLARIFY    → Vérifier qu'on comprend exactement ce qui est demandé
-2. PLAN       → Écrire le plan d'implémentation avant de coder
-3. TDD        → Écrire les tests d'abord
-4. IMPLEMENT  → Implémenter pour faire passer les tests
-5. VERIFY     → Vérifier que tout passe, rien de cassé
-```
-
-### Exemple Corex — Feature 03 (SnapshotService)
-
-**Étape 1 — Clarify**
-```
-Q: Le snapshot doit-il capturer UNIQUEMENT les clés modifiées,
-   ou toutes les clés des hives HKLM\SOFTWARE et HKCU ?
-R: Uniquement les clés qui seront modifiées par les tweaks sélectionnés.
-   Pas de snapshot global — trop lourd et risque d'exposition de données sensibles.
-```
-
-**Étape 2 — Plan**
-```
-SnapshotService plan :
-1. CreateAsync(label) → crée un snapshot vide, retourne ISnapshot
-2. ISnapshot.RegisterKey(hive, path, valueName) → enregistre la valeur actuelle
-3. ITweakEngine appelle RegisterKey avant chaque modification
-4. ISnapshot.CommitAsync() → marque le snapshot comme complet, sauvegarde JSON GZip
-5. ISnapshot.RollbackAsync() → restaure chaque valeur enregistrée dans l'ordre inverse
-6. SnapshotManager.ListAsync() → retourne les 10 derniers snapshots
-7. SnapshotManager.RestoreAsync(id) → charge et exécute le rollback d'un snapshot archivé
-```
-
-**Étape 3 — TDD**
-```csharp
-// Tests AVANT le code
-[Fact]
-public async Task CreateSnapshot_ShouldCaptureRegistryValue()
-{
-    // Arrange
-    var service = new SnapshotService(_logger, _storage);
-
-    // Act
-    var snapshot = await service.CreateAsync("test-snapshot");
-    await snapshot.RegisterKeyAsync(RegistryHive.LocalMachine, @"SOFTWARE\Test", "Value");
-
-    // Assert
-    Assert.Single(snapshot.Entries);
-    Assert.Equal(@"SOFTWARE\Test", snapshot.Entries[0].Path);
-}
-
-[Fact]
-public async Task Rollback_ShouldRestoreOriginalValue()
-{
-    // Arrange : modifier une valeur, créer snapshot avec valeur d'avant
-    // Act : rollback
-    // Assert : valeur restaurée
-}
-```
-
-**Étape 4 — Implement**
-Code pour faire passer les tests — pas plus.
-
-**Étape 5 — Verify**
-```bash
-dotnet test --filter "Category=Unit&Class=SnapshotServiceTests"
-# Tous au vert → PR vers develop
+PAUL Unify — session [date]
+Terminé : [liste features / étapes]
+Décisions : [liste des choix techniques actés]
+Points ouverts : [ce qui reste + blocages]
+Prochaine session : [objectif exact]
 ```
 
 ---
 
-## Session type journalière
+## Session type
 
 ```
-09:00  PAUL load → charger l'état, définir l'objectif du jour
-09:10  gstack /plan-eng-review si décision archi nécessaire
-09:30  Superpowers : Clarify → Plan → TDD → Implement → Verify
-12:00  Commit WIP sur feature branch
-14:00  Superpowers : suite ou nouvelle feature
-17:00  PAUL update → noter les décisions prises, mettre à jour backlog.md
-17:15  Commit final + push
-```
+[Démarrage]
+  └─ Claude Memory charge l'état Corex automatiquement
+  └─ PAUL Plan : coller le template, définir l'objectif
 
----
+[Si nouvelle feature ou choix archi]
+  └─ gstack /plan-eng-review ou /office-hours
 
-## Anti-patterns à éviter
+[Avant le code]
+  └─ Context7 : charger la doc des APIs concernées
 
-```
-❌ Coder directement sans passer par PAUL au début de session
-   → On répare des bugs qu'on avait déjà corrigés la semaine passée
+[Implémentation]
+  └─ Superpowers : Clarify → Plan → Test → Implement → Verify
+  └─ Headroom : surveille passivement
 
-❌ Utiliser gstack pour de l'exécution (lui demander d'écrire du code)
-   → Consomme des tokens pour rien, c'est le rôle de Superpowers
-
-❌ Skiper le TDD "parce que c'est un petit fix"
-   → Le SnapshotService s'est cassé exactement sur un "petit fix"
-
-❌ Merger dans main sans CI vert
-   → Règle absolue, sans exception
-
-❌ Activer 5+ rôles gstack simultanément
-   → Context overflow, réponses génériques inutiles
+[Fin de session ou 70% contexte]
+  └─ PAUL Unify → Claude Memory sync → commit + push
 ```
 
 ---
 
-## Checklist de fin de session
+## Anti-patterns workflow
 
-- [ ] `backlog.md` mis à jour avec le statut des features
-- [ ] PAUL context sauvegardé avec les décisions du jour
-- [ ] Commits pushés sur la feature branch
-- [ ] Aucun TODO laissé sans issue créée
-- [ ] Tests au vert sur les features touchées
+```
+❌ Ouvrir Claude Code et coder directement sans PAUL Plan
+❌ Utiliser ManagementObjectSearcher sans avoir chargé la doc System.Management via Context7
+❌ Écrire du code avant d'avoir écrit les tests (TDD = tests d'abord)
+❌ Ignorer Headroom et continuer quand le contexte se dégrade
+❌ Fermer une session sans PAUL Unify → décisions perdues
+❌ Activer 5+ rôles gstack simultanément → context overflow
+❌ Merger dans dev sans CI verte
+```
