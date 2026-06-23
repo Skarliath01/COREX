@@ -51,6 +51,7 @@ Corex/
 │   │   │   └── SystemSnapshot.cs     # Snapshot avant modification
 │   │   ├── Services/
 │   │   │   ├── HardwareDetectionService.cs
+│   │   │   ├── HardwareDetectionOptions.cs
 │   │   │   ├── TweakEngineService.cs
 │   │   │   ├── SnapshotService.cs
 │   │   │   ├── UninstallerService.cs
@@ -63,13 +64,15 @@ Corex/
 │   │   │   └── StorageRules.cs
 │   │   └── Interfaces/
 │   │       ├── IHardwareDetector.cs
+│   │       ├── IWmiQuery.cs
 │   │       ├── ITweakEngine.cs
 │   │       └── ISnapshotManager.cs
 │   │
 │   ├── Corex.Engine/                 # Accès bas niveau
 │   │   ├── Wmi/
+│   │   │   ├── IWmiQueryExecutor.cs
 │   │   │   ├── WmiQuery.cs
-│   │   │   └── WmiCache.cs
+│   │   │   └── WmiQueryExecutor.cs
 │   │   ├── Registry/
 │   │   │   ├── RegistryTweak.cs
 │   │   │   └── RegistrySnapshot.cs
