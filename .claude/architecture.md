@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    COREX DESKTOP APP                        │
 │            C# 13 + .NET 10 LTS + WinUI 3 (WASDK)            │
@@ -18,13 +18,13 @@
                     │ Node.js/Express │
                     │  PostgreSQL     │
                     └─────────────────┘
-```
+```text
 
 ---
 
 ## Structure des dossiers
 
-```
+```text
 Corex/
 ├── src/
 │   ├── Corex.App/                    # Projet WinUI 3 principal
@@ -117,13 +117,14 @@ Corex/
 │   └── workflows/
 ├── docs/
 └── README.md
-```
+```csharp
 
 ---
 
 ## Patterns architecturaux
 
 ### MVVM strict
+
 - **View** (XAML) : zéro logique métier, bindings uniquement
 - **ViewModel** : logique UI, commandes, état observable
 - **Model/Service** : logique métier pure, testable sans UI
@@ -176,6 +177,7 @@ public enum RiskLevel
 ## Couche Native (C++ DLL)
 
 Utilisée uniquement pour ce que C#/WMI ne peut pas atteindre :
+
 - Monitoring GPU temps réel (NVAPI pour NVIDIA, ADL pour AMD, IGCL pour Intel)
 - `timeBeginPeriod(1)` / `timeEndPeriod(1)` pour timer resolution
 - Lecture SMART disques via DeviceIoControl
@@ -189,12 +191,12 @@ Chaque appel natif est wrappé dans un service C# avec fallback gracieux si la D
 
 ### Endpoints principaux
 
-```
+```text
 POST   /api/v1/licenses/validate      # Validation clé licence
 POST   /api/v1/licenses/activate      # Activation machine
 GET    /api/v1/updates/check          # Vérification mise à jour
 POST   /api/v1/analytics/heartbeat    # Heartbeat anonyme (opt-in)
-```
+```sql
 
 ### Schéma DB minimal
 

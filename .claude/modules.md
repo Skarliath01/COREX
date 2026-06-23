@@ -3,6 +3,7 @@
 Référence rapide des 12 modules — scope par version et responsabilités techniques.
 
 ## Légende
+
 - ✅ V1 MVP (mois 1–4)
 - 🔜 V2 (mois 5–10)
 - 🔮 V3 (mois 11–18+)
@@ -36,12 +37,14 @@ Référence rapide des 12 modules — scope par version et responsabilités tech
 ### Sous-modules
 
 **Confidentialité/Télémétrie** ✅ V1
+
 - DiagTrack, dmwappushsvc, WER, CEIP, Windows Insider
 - Télémétrie NVIDIA (NvTelemetryContainer), AMD (Crash Defender), Intel
 - Historique activité, ID publicitaire, géolocalisation, Cortana cloud
 - Sync paramètres cloud, presse-papier cloud, données manuscrites
 
 **Confort/Interface** ✅ V1
+
 - Effets visuels/animations Aero, transparence
 - Store dans recherche, widgets W11, Copilot, OneDrive complet
 - Souris gaming (accélération off, DPI constant)
@@ -50,6 +53,7 @@ Référence rapide des 12 modules — scope par version et responsabilités tech
 - Debloat apps préinstallées (Candy Crush, Mixed Reality, Bing apps, Solitaire...)
 
 **Performances** ✅ V1
+
 - Plan alimentation Haute Performance / Performances Optimales
 - Hibernation (libère hiberfil.sys jusqu'à 16+ Go)
 - Apps arrière-plan Store
@@ -63,6 +67,7 @@ Référence rapide des 12 modules — scope par version et responsabilités tech
 - Pagefile optimisation selon RAM détectée
 
 **Nettoyage** ✅ V1
+
 - Prefetch, cache Windows, dossiers temp système/utilisateur
 - Caches shaders DirectX, Vulkan, OpenGL, NVIDIA, AMD, Intel
 - Winsock + pile TCP/IP reset
@@ -97,6 +102,7 @@ Chaque tweak implémente `ITweak` avec `IsApplicable(HardwareProfile)` obligatoi
 **Statut V1 :** ✅ Core — différenciateur fort vs FPSDoctor
 
 **V1 inclut :**
+
 - Désinstallation standard + suppression résidus AppData (Local, Roaming, LocalLow), ProgramData, Program Files orphelins
 - Nettoyage clés registre orphelines
 - Nettoyage raccourcis orphelins (Bureau, Menu Démarrer, Barre des tâches)
@@ -107,6 +113,7 @@ Chaque tweak implémente `ITweak` avec `IsApplicable(HardwareProfile)` obligatoi
 - Log détaillé de tout ce qui a été supprimé
 
 **V2 ajoute :**
+
 - Désinstallation par lot (sélection multiple)
 - Mode désinstallation forcée (apps sans uninstaller fonctionnel)
 - Détection logiciels jamais lancés depuis >6 mois
@@ -123,11 +130,13 @@ Chaque tweak implémente `ITweak` avec `IsApplicable(HardwareProfile)` obligatoi
 **Statut V2 :** 🔜 Complet
 
 **V1 :**
+
 - Réinitialisation Winsock + pile TCP/IP
 - Désactivation économies énergie carte réseau
 - IPv6 — conditionnel si cause latence
 
 **V2 :**
+
 - Benchmark DNS automatique (Cloudflare, Google, OpenDNS, Quad9, NextDNS, FAI locaux)
 - DNS over HTTPS (DoH)
 - Optimisation MTU selon connexion
@@ -146,12 +155,14 @@ Chaque tweak implémente `ITweak` avec `IsApplicable(HardwareProfile)` obligatoi
 **Statut V2 :** 🔜 Mode gaming auto + overlay
 
 **V1 :**
+
 - Profil Gaming : plan performance + tweaks GPU NVIDIA/AMD adaptatifs + réseau QoS basique
 - Tweaks NVIDIA Control Panel par jeu (prefer max performance, shader cache, GSYNC)
 - Tweaks AMD Radeon Software (Anti-lag, Chill off, image sharpening)
 - FSO désactivation par jeu
 
 **V2 :**
+
 - Mode Gaming auto au lancement d'un jeu détecté (Steam, Epic, GOG, Battle.net, EA App, Xbox, Ubisoft)
 - Profils par jeu avec tweaks moteur spécifiques (Unreal, Unity, Source 2, id Tech)
 - Overlay FPS/températures/RAM intégré (sans MSI Afterburner)
@@ -161,6 +172,7 @@ Chaque tweak implémente `ITweak` avec `IsApplicable(HardwareProfile)` obligatoi
 - Désactivation notifications + Windows Update pendant session gaming
 
 **V3 :**
+
 - Intégration Steam API — bibliothèque jeux + tweaks spécifiques top 100 jeux
 - DLSS/FSR/XeSS — guide activation par jeu
 
@@ -172,6 +184,7 @@ Chaque tweak implémente `ITweak` avec `IsApplicable(HardwareProfile)` obligatoi
 **Statut V2 :** 🔜 Historique 30j + alertes avancées
 
 **V1 :**
+
 - Dashboard temps réel CPU/GPU/RAM/stockage
 - Alertes critiques : SSD santé SMART dégradée, CPU temp repos >55°C, RAM >85% repos
 - Analyse apps démarrage avec score d'impact boot chiffré
@@ -179,6 +192,7 @@ Chaque tweak implémente `ITweak` avec `IsApplicable(HardwareProfile)` obligatoi
 - Benchmark rapide CPU/RAM/SSD (avant/après)
 
 **V2 :**
+
 - Historique températures 24h/7j/30j
 - Détection dégradation thermique progressive (pasta à refaire, ventilateurs)
 - Prédiction durée de vie SSD (TBW restants + rythme écriture actuel)

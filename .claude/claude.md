@@ -1,6 +1,7 @@
 # Corex by Altysin — Claude Operational Guide
 
 ## Identité produit
+
 **Corex** est un optimiseur PC Windows de nouvelle génération, premier produit de l'entreprise **Altysin**.
 Tagline : *"Your PC. Your Core. Unleashed."*
 Concurrent principal : FPSDoctor (~2 000 users FR). Différenciateur central : **tweaks adaptatifs conditionnels au hardware détecté** — jamais un tweak NVIDIA sur une machine AMD, jamais une défrag sur un SSD.
@@ -9,10 +10,10 @@ Concurrent principal : FPSDoctor (~2 000 users FR). Différenciateur central : *
 
 ## Workflow en 3 couches
 
-```
+```text
 gstack   →  PAUL/GSD  →  Superpowers
 Décision    Stabilité     Exécution
-```
+```text
 
 | Couche | Outil | Rôle | Quand l'utiliser |
 |--------|-------|------|-----------------|
@@ -26,7 +27,7 @@ Décision    Stabilité     Exécution
 
 ## Stack technique
 
-```
+```bash
 App desktop    : C# 13 + .NET 10 LTS + WinUI 3 (WASDK)  — Win 10 22H2 minimum
 Bas niveau     : C++ / P/Invoke pour WMI, Registry, WinAPI, GPU APIs
 Installeur     : Inno Setup 6
@@ -34,7 +35,7 @@ Signature      : Certificat EV Authenticode (obligatoire dès V1)
 Backend        : Node.js + Express + PostgreSQL (licences, updates, analytics)
 Frontend web   : React + TypeScript (site Altysin)
 Updates        : Sparkle/WinSparkle ou update silencieux maison
-```
+```text
 
 > Zéro Electron. Zéro framework lourd. Performances natives uniquement.
 
@@ -66,7 +67,7 @@ Updates        : Sparkle/WinSparkle ou update silencieux maison
 
 ## Priorités MVP V1 (mois 1–4)
 
-```
+```text
 P0 CRITIQUE (bloquant tout le reste)
 ├── M1 : Détection hardware complète (WMI/Registry)
 ├── M1 : Moteur de règles conditionnelles hardware→tweaks
@@ -85,7 +86,7 @@ P1 (V1 complète)
 ├── M7 : Alertes critiques (SMART, température, RAM)
 ├── M7 : Score santé PC 0–100
 └── M7 : Benchmark rapide avant/après
-```
+```text
 
 ---
 
@@ -110,6 +111,7 @@ P1 (V1 complète)
 ## Compétiteur principal : FPSDoctor
 
 **Leurs faiblesses exploitables en V1 :**
+
 - Hardware détecté mais tweaks identiques pour tous → notre killer feature
 - GPU AMD verrouillé → on supporte NVIDIA + AMD + Intel dès V1
 - Zéro désinstalleur propre → notre Module 4
@@ -122,19 +124,20 @@ P1 (V1 complète)
 
 ## Branches GitHub
 
-```
+```text
 main      ← Production (users finaux) — merge depuis staging uniquement
 staging   ← Recette/QA — merge depuis dev uniquement
 dev       ← Intégration — toutes les features/fix/hotfix squash mergées ici
 
 feature/* fix/* hotfix/*  ← toujours créées depuis dev, jamais depuis staging ou main
-```
+```text
 
 **Flow obligatoire :** `feature/x` → squash merge → `dev` → merge commit → `staging` → merge commit + tag → `main` → CI release
 
 ## Session startup checklist
 
 Avant chaque session de dev, vérifier :
+
 - [ ] PAUL chargé avec l'état actuel du projet
 - [ ] Branche feature créée depuis `develop`
 - [ ] Snapshot VM de test créé
@@ -142,11 +145,11 @@ Avant chaque session de dev, vérifier :
 
 ## Commandes gstack fréquentes
 
-```
+```text
 /plan-eng-review   → revue architecture avant d'implémenter
 /plan-ceo-review   → décision produit / priorisation
 /office-hours      → question ouverte multi-rôle
-```
+```text
 
 ---
 
