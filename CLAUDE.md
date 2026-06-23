@@ -92,6 +92,7 @@ Cible : Windows 10 22H2 min · x64 uniquement V1 · UAC `requireAdministrator` a
 - ❌ API ou NuGet sans Context7 d'abord · Code sans PAUL Plan préalable
 - ❌ Tweak 🔴 Expert sans double confirmation · Binaire distribué non signé EV
 - ❌ `Console.WriteLine` en prod · Secret dans le code source · Toucher `pokegenesis`
+- ❌ **Supprimer `dev`, `staging` ou `main`** — jamais, quelle que soit l'action
 
 ---
 
