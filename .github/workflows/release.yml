@@ -40,13 +40,16 @@ jobs:
 
       - name: Build Release
         run: |
-          dotnet publish src/Corex.App/Corex.App.csproj `
-            --configuration Release `
-            --runtime win-x64 `
-            --self-contained false `
+          msbuild 'src\Corex.App\Corex.App.csproj' `
+            /t:Publish `
+            /p:Configuration=Release `
+            /p:Platform=x64 `
+            /p:RuntimeIdentifier=win-x64 `
+            /p:SelfContained=false `
             /p:Version=${{ steps.version.outputs.VERSION }} `
             /p:PublishSingleFile=false `
-            --output ./publish
+            "/p:PublishDir=${{ github.workspace }}\publish" `
+            /p:RestorePackages=false
 
       - name: Build Native DLL (C++)
         run: |
