@@ -17,7 +17,7 @@ Ces features bloquent tout le reste. Rien d'autre ne commence avant qu'elles soi
 
 | # | Feature | Module | Complexité | Statut |
 |---|---------|--------|-----------|--------|
-| 01 | Détection hardware complète (WMI/Registry) — CPU, GPU, RAM, stockage, réseau, OS | M1 | Complexe | `[ ]` |
+| 01 | Détection hardware complète (WMI/Registry) — CPU, GPU, RAM, stockage, réseau, OS | M1 | Complexe | `[x]` |
 | 02 | Moteur de règles conditionnelles (HardwareProfile → tweaks disponibles) | M1 | Complexe | `[ ]` |
 | 03 | Snapshot Registry + restauration complète avant toute modification | M10 | Moyen | `[ ]` |
 | 04 | Infrastructure tweak : log horodaté, valeur avant/après, indicateur risque 🟢🟡🔴 | M10 | Moyen | `[ ]` |

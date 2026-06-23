@@ -95,21 +95,29 @@ Cible : Windows 10 22H2 min · x64 uniquement V1 · UAC `requireAdministrator` a
 
 ---
 
-## Feature en cours : F01 — Détection hardware
+## F01 — Détection hardware (LIVRÉ)
 
-Branch : `feature/m1-hardware-detection` depuis `dev`
+Branch `feature/m1-hardware-detection` — squash merge vers `dev` en attente.
 
+Fichiers livrés :
 ```
 src/Corex.Core/Interfaces/IHardwareDetector.cs
+src/Corex.Core/Interfaces/IWmiQuery.cs
 src/Corex.Core/Models/HardwareProfile.cs + CpuInfo + GpuInfo + RamInfo + StorageInfo
-src/Corex.Core/Services/HardwareDetectionService.cs
-src/Corex.Engine/Wmi/WmiQuery.cs + WmiCache.cs
-Corex.Tests/Unit/HardwareDetectionTests.cs  [Category=Unit]
+src/Corex.Core/Services/HardwareDetectionService.cs  (thread-safe, SemaphoreSlim, cache volatile)
+src/Corex.Core/Services/HardwareDetectionOptions.cs  (CacheTtl = 60 min par défaut)
+src/Corex.Engine/Wmi/IWmiQueryExecutor.cs
+src/Corex.Engine/Wmi/WmiQuery.cs
+src/Corex.Engine/Wmi/WmiQueryExecutor.cs
+src/Corex.Tests/Fixtures/HardwareFixtures.cs
+src/Corex.Tests/Unit/HardwareDetectionTests.cs  [Category=Unit]  (16 tests)
+src/Corex.Tests/Unit/WmiQueryTests.cs            [Category=Unit]  (15 tests)
 ```
 
-Spec : CPU (vendor, cores, fréq), GPU (Nvidia/AMD/Intel, VRAM), RAM (total, DDR4/5), Stockage (NVMe/SSD/HDD, SMART).
-Cache 60 min. `HardwareProfile.Current` complet <3s. Tests sur profils Moq sans hardware réel.
-Commit : `feat(m1): implement hardware detection via WMI`
+Livré V1 : CPU (vendor, cores, fréq), GPU (Nvidia/AMD/Intel, VRAM, tiebreaker AMD dual-GPU), RAM (total, DDR4/5), Stockage (NVMe/SSD/HDD, SMART).
+Déféré V1.1 : Réseau (adaptateur, débit) + OS (version, BIOS, Secure Boot) — voir TODOS.md.
+Cache 60 min configurable via `HardwareDetectionOptions.CacheTtl`. 31 tests unitaires sur profils Moq sans hardware réel.
+Prochaine feature : F02 — Moteur de règles conditionnelles (M1).
 
 ---
 
@@ -129,3 +137,23 @@ Commit : `feat(m1): implement hardware detection via WMI`
 | `rules/ui.md` | x:Bind, MVVM, palette Corex (auto-chargé sur Corex.App) |
 | `rules/engine.md` | ITweakRule, snapshot pattern (auto-chargé sur Corex.Core/Rules + Corex.Engine) |
 
+Fichier racine : `TODOS.md` — suivi des suivis post-ship (P1/P2/P3 par feature).
+
+## Skill routing
+
+When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.
+
+Key routing rules:
+- Product ideas/brainstorming → invoke /office-hours
+- Strategy/scope → invoke /plan-ceo-review
+- Architecture → invoke /plan-eng-review
+- Design system/plan review → invoke /design-consultation or /plan-design-review
+- Full review pipeline → invoke /autoplan
+- Bugs/errors → invoke /investigate
+- QA/testing site behavior → invoke /qa or /qa-only
+- Code review/diff check → invoke /review
+- Visual polish → invoke /design-review
+- Ship/deploy/PR → invoke /ship or /land-and-deploy
+- Save progress → invoke /context-save
+- Resume context → invoke /context-restore
+- Author a backlog-ready spec/issue → invoke /spec
