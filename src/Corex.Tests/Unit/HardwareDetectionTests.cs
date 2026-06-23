@@ -212,6 +212,24 @@ public class HardwareDetectionTests
         Assert.Equal("RTX 3080", profile.PrimaryGpu.Name);
     }
 
+    [Fact]
+    public async Task HardwareProfile_PrimaryGpu_AmdDualGpu_HighestVramWins()
+    {
+        _mockWmiQuery.Setup(x => x.DetectCpuAsync(default)).ReturnsAsync(CpuInfo.Unknown);
+        _mockWmiQuery.Setup(x => x.DetectGpusAsync(default)).ReturnsAsync(new[]
+        {
+            new GpuInfo { Vendor = GpuVendor.Amd, VramBytes = 8L * 1024 * 1024 * 1024, Name = "RX 7900 XTX" },
+            new GpuInfo { Vendor = GpuVendor.Amd, VramBytes = 4L * 1024 * 1024 * 1024, Name = "RX 6700 XT" }
+        });
+        _mockWmiQuery.Setup(x => x.DetectRamAsync(default)).ReturnsAsync(RamInfo.Unknown);
+        _mockWmiQuery.Setup(x => x.DetectStorageAsync(default)).ReturnsAsync(StorageInfo.Unknown);
+
+        var profile = await _service.DetectAsync();
+
+        Assert.Equal(8L * 1024 * 1024 * 1024, profile.PrimaryGpu.VramBytes);
+        Assert.Equal("RX 7900 XTX", profile.PrimaryGpu.Name);
+    }
+
     private void SetupHappyPath()
     {
         _mockWmiQuery.Setup(x => x.DetectCpuAsync(default)).ReturnsAsync(MakeIntelCpu());
