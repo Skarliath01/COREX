@@ -173,6 +173,45 @@ public class HardwareDetectionTests
         Assert.Equal(8, profile.Cpu.PhysicalCoreCount);
     }
 
+    [Fact]
+    public async Task DetectAsync_HappyPath_HasUnknownComponents_IsFalse()
+    {
+        SetupHappyPath();
+        var profile = await _service.DetectAsync();
+        Assert.False(profile.HasUnknownComponents);
+    }
+
+    [Fact]
+    public async Task DetectAsync_WithActiveTtl_SecondCallHitsCacheSkipsWmi()
+    {
+        var options = Options.Create(new HardwareDetectionOptions { CacheTtl = TimeSpan.FromHours(1) });
+        var service = new HardwareDetectionService(_mockWmiQuery.Object, options);
+        SetupHappyPath();
+
+        await service.DetectAsync();
+        await service.DetectAsync(); // cache hit — must NOT trigger another WMI call
+
+        _mockWmiQuery.Verify(x => x.DetectCpuAsync(default), Times.Once());
+    }
+
+    [Fact]
+    public async Task HardwareProfile_PrimaryGpu_MultipleNonIntelGpus_HighestVramWins()
+    {
+        _mockWmiQuery.Setup(x => x.DetectCpuAsync(default)).ReturnsAsync(CpuInfo.Unknown);
+        _mockWmiQuery.Setup(x => x.DetectGpusAsync(default)).ReturnsAsync(new[]
+        {
+            new GpuInfo { Vendor = GpuVendor.Nvidia, VramBytes = 4L * 1024 * 1024 * 1024, Name = "RTX 3070" },
+            new GpuInfo { Vendor = GpuVendor.Nvidia, VramBytes = 8L * 1024 * 1024 * 1024, Name = "RTX 3080" }
+        });
+        _mockWmiQuery.Setup(x => x.DetectRamAsync(default)).ReturnsAsync(RamInfo.Unknown);
+        _mockWmiQuery.Setup(x => x.DetectStorageAsync(default)).ReturnsAsync(StorageInfo.Unknown);
+
+        var profile = await _service.DetectAsync();
+
+        Assert.Equal(8L * 1024 * 1024 * 1024, profile.PrimaryGpu.VramBytes);
+        Assert.Equal("RTX 3080", profile.PrimaryGpu.Name);
+    }
+
     private void SetupHappyPath()
     {
         _mockWmiQuery.Setup(x => x.DetectCpuAsync(default)).ReturnsAsync(MakeIntelCpu());
