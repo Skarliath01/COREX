@@ -67,12 +67,15 @@ public class HardwareDetectionTests
             .ThrowsAsync(new TimeoutException("WMI timeout"));
         _mockWmiQuery.Setup(x => x.DetectRamAsync(default)).ReturnsAsync(new RamInfo
         {
-            TotalBytes = 16L * 1024 * 1024 * 1024, Generation = RamGeneration.Ddr4
+            TotalBytes = 16L * 1024 * 1024 * 1024,
+            Generation = RamGeneration.Ddr4
         });
         _mockWmiQuery.Setup(x => x.DetectStorageAsync(default)).ReturnsAsync(new StorageInfo
         {
-            Type = StorageType.NvmeSsd, SmartStatus = SmartStatus.Healthy,
-            SizeBytes = 1L * 1024 * 1024 * 1024 * 1024, Model = "Samsung 970"
+            Type = StorageType.NvmeSsd,
+            SmartStatus = SmartStatus.Healthy,
+            SizeBytes = 1L * 1024 * 1024 * 1024 * 1024,
+            Model = "Samsung 970"
         });
 
         var profile = await _service.DetectAsync();
@@ -179,18 +182,24 @@ public class HardwareDetectionTests
         });
         _mockWmiQuery.Setup(x => x.DetectRamAsync(default)).ReturnsAsync(new RamInfo
         {
-            TotalBytes = 16L * 1024 * 1024 * 1024, Generation = RamGeneration.Ddr4
+            TotalBytes = 16L * 1024 * 1024 * 1024,
+            Generation = RamGeneration.Ddr4
         });
         _mockWmiQuery.Setup(x => x.DetectStorageAsync(default)).ReturnsAsync(new StorageInfo
         {
-            Type = StorageType.NvmeSsd, SmartStatus = SmartStatus.Healthy,
-            SizeBytes = 1L * 1024 * 1024 * 1024 * 1024, Model = "Samsung 970"
+            Type = StorageType.NvmeSsd,
+            SmartStatus = SmartStatus.Healthy,
+            SizeBytes = 1L * 1024 * 1024 * 1024 * 1024,
+            Model = "Samsung 970"
         });
     }
 
     private static CpuInfo MakeIntelCpu() => new()
     {
-        Vendor = CpuVendor.Intel, Name = "Intel Core i7",
-        PhysicalCoreCount = 8, LogicalCoreCount = 16, MaxClockSpeedMHz = 3600
+        Vendor = CpuVendor.Intel,
+        Name = "Intel Core i7",
+        PhysicalCoreCount = 8,
+        LogicalCoreCount = 16,
+        MaxClockSpeedMHz = 3600
     };
 }
