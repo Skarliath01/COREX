@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-```
+```text
 Push feature branch
        │
        ▼
@@ -16,7 +16,7 @@ Push feature branch
        │
        ▼
   Release GitHub + Backend deploy
-```
+```csharp
 
 ---
 
@@ -353,7 +353,7 @@ jobs:
 
 ## Versioning — SemVer strict
 
-```
+```text
 v{MAJOR}.{MINOR}.{PATCH}[-{pre}]
 
 v1.0.0        → Release stable
@@ -362,7 +362,7 @@ v1.1.0        → Nouvelle feature rétrocompatible
 v2.0.0        → Breaking change (rare)
 v1.1.0-beta.1 → Bêta publique
 v1.1.0-rc.1   → Release candidate
-```
+```bash
 
 **Convention de tag** : toujours depuis `main`, jamais depuis `develop` directement.
 
@@ -378,6 +378,7 @@ git push origin v1.0.0
 ## Checklist pre-release manuelle
 
 Avant de tagger une release :
+
 - [ ] Tous les tests unitaires passent sur `main`
 - [ ] Tests manuels sur Windows 10 22H2 VM
 - [ ] Tests manuels sur Windows 11 24H2 VM

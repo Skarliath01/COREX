@@ -4,6 +4,7 @@
 Mise à jour au fil du développement.
 
 ## Statuts
+
 - `[ ]` À faire
 - `[~]` En cours
 - `[x]` Terminé
@@ -69,7 +70,7 @@ Ces features bloquent tout le reste. Rien d'autre ne commence avant qu'elles soi
 
 ## Ordre de développement recommandé
 
-```
+```text
 Semaine 1  : Setup projet C# + WinUI 3, structure dossiers, CI basique
 Semaine 2  : Feature 01 — Détection hardware (WMI CPU + GPU + RAM)
 Semaine 3  : Feature 01 suite (stockage SMART, réseau, OS) + Feature 02 (moteur règles)
@@ -86,13 +87,14 @@ Semaine 13 : Feature 18 (score santé) + Feature 19 (benchmark)
 Semaine 14 : Feature 20 (profil gaming) + polish UI général
 Semaine 15 : Tests end-to-end sur 5 configs, bugfix, optimisation
 Semaine 16 : Release bêta publique
-```
+```text
 
 ---
 
 ## Définition of Done (DoD) par feature
 
 Une feature est "terminée" quand :
+
 - [ ] Tests unitaires écrits et au vert (coverage >80% du code nouveau)
 - [ ] Testé manuellement sur Windows 10 22H2 VM
 - [ ] Testé manuellement sur Windows 11 24H2 VM

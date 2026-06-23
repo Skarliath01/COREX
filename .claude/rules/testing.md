@@ -6,13 +6,13 @@ paths: ["Corex.Tests/**"]
 
 ## Cycle Superpowers — ordre strict sans exception
 
-```
+```csharp
 1. Clarify    → poser TOUTES les questions ambiguës AVANT d'écrire une ligne
 2. Plan       → lister les cas de test, classes, interfaces à créer
 3. Test       → écrire les tests complets (ils DOIVENT être rouges au premier run)
 4. Implement  → code minimal qui fait passer les tests — rien de plus
 5. Verify     → dotnet test vert + dotnet format --verify-no-changes
-```
+```text
 
 Ne jamais passer à Implement sans que les tests soient écrits et compilent.
 
@@ -27,7 +27,7 @@ Filtrer en CI : `--filter "Category=Unit"` (CI rapide) | `--filter "Category=Int
 
 ## Nommage — convention stricte
 
-```
+```text
 [MethodName]_[Scenario]_[ExpectedResult]
 
 DetectGpu_OnNvidiaCard_ReturnsNvidiaVendor
@@ -35,7 +35,7 @@ DetectStorage_OnNvmeDrive_ReturnsNvmeType
 DisableSysMain_WhenStorageIsHdd_DoesNotApply
 ApplyNvidiaTweak_WhenGpuIsAmd_SkipsSilently
 Snapshot_WhenApplyFails_RollsBackAllChanges
-```
+```csharp
 
 ## Structure Arrange / Act / Assert
 
