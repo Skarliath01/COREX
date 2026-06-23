@@ -4,12 +4,14 @@ using Microsoft.Extensions.Options;
 
 namespace Corex.Core.Services;
 
-public sealed class HardwareDetectionService : IHardwareDetector
+public sealed class HardwareDetectionService : IHardwareDetector, IDisposable
 {
     private readonly IWmiQuery _wmiQuery;
     private readonly IOptions<HardwareDetectionOptions> _options;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private HardwareProfile? _cachedProfile;
+    // volatile: ensures the outer fast-path null check is a fresh read across
+    // CPU cores, preventing torn reads with concurrent ClearCache() calls.
+    private volatile HardwareProfile? _cachedProfile;
     private DateTimeOffset _cachedAt = DateTimeOffset.MinValue;
 
     public HardwareDetectionService(IWmiQuery wmiQuery, IOptions<HardwareDetectionOptions> options)
@@ -28,7 +30,6 @@ public sealed class HardwareDetectionService : IHardwareDetector
         await _semaphore.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            // Double-check inside lock
             if (_cachedProfile is not null && DateTimeOffset.UtcNow - _cachedAt < ttl)
                 return _cachedProfile;
 
@@ -58,21 +59,28 @@ public sealed class HardwareDetectionService : IHardwareDetector
 
     public Task<HardwareProfile> RefreshAsync(CancellationToken ct = default)
     {
-        // V1: no-op — returns cached profile or Unknown, never re-triggers WMI
         return Task.FromResult(_cachedProfile ?? HardwareProfile.Unknown);
     }
 
     public void ClearCache()
     {
-        _cachedProfile = null;
+        // Write _cachedAt before nulling _cachedProfile so readers racing the
+        // outer fast-path see an expired TTL before they see a null profile.
         _cachedAt = DateTimeOffset.MinValue;
+        _cachedProfile = null; // volatile write — visible to all threads immediately
     }
+
+    public void Dispose() => _semaphore.Dispose();
 
     private static async Task<T> SafeDetectAsync<T>(Func<Task<T>> detect, T fallback)
     {
         try
         {
             return await detect().ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
         }
         catch
         {
