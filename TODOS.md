@@ -8,6 +8,9 @@
 - [ ] **[P2] CancellationToken propagation** — Plomber `ct` dans les appels WMI synchrones (actuellement `Task.Run(DetectCpu, ct)` ne cancelle pas l'exécution en cours)
 - [ ] **[P3] RefreshAsync V2** — Implémenter le vrai refresh WMI (invalider cache + re-détecter) — V1 no-op intentionnel
 
+- [ ] **[P2] Réseau detection** — `NetworkInfo` record (Win32_NetworkAdapter) : type filaire/WiFi, fabricant, débit max — déféré de F01 V1
+- [ ] **[P2] OS detection** — `OsInfo` record (Win32_OperatingSystem + Registry) : version exacte, BIOS/UEFI, Secure Boot, TPM — déféré de F01 V1
+
 ## Completed
 
 <!-- Items complétés lors du merge avec version et date -->

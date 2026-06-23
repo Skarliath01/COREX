@@ -110,11 +110,12 @@ src/Corex.Engine/Wmi/IWmiQueryExecutor.cs
 src/Corex.Engine/Wmi/WmiQuery.cs
 src/Corex.Engine/Wmi/WmiQueryExecutor.cs
 src/Corex.Tests/Fixtures/HardwareFixtures.cs
-src/Corex.Tests/Unit/HardwareDetectionTests.cs  [Category=Unit]  (20 tests)
-src/Corex.Tests/Unit/WmiQueryTests.cs            [Category=Unit]  (11 tests)
+src/Corex.Tests/Unit/HardwareDetectionTests.cs  [Category=Unit]  (16 tests)
+src/Corex.Tests/Unit/WmiQueryTests.cs            [Category=Unit]  (15 tests)
 ```
 
-Livré : CPU (vendor, cores, fréq), GPU (Nvidia/AMD/Intel, VRAM, tiebreaker AMD dual-GPU), RAM (total, DDR4/5), Stockage (NVMe/SSD/HDD, SMART).
+Livré V1 : CPU (vendor, cores, fréq), GPU (Nvidia/AMD/Intel, VRAM, tiebreaker AMD dual-GPU), RAM (total, DDR4/5), Stockage (NVMe/SSD/HDD, SMART).
+Déféré V1.1 : Réseau (adaptateur, débit) + OS (version, BIOS, Secure Boot) — voir TODOS.md.
 Cache 60 min configurable via `HardwareDetectionOptions.CacheTtl`. 31 tests unitaires sur profils Moq sans hardware réel.
 Prochaine feature : F02 — Moteur de règles conditionnelles (M1).
 
