@@ -2,7 +2,7 @@ namespace Corex.Core.Models;
 
 public enum StorageType { Unknown, NvmeSsd, Ssd, Hdd }
 
-public enum SmartStatus { Unknown, Healthy, Warning, Unhealthy, Unavailable }
+public enum SmartStatus { Unknown, Healthy, Warning, Unhealthy }
 
 public sealed record StorageInfo
 {
