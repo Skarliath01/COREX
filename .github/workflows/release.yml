@@ -68,7 +68,7 @@ jobs:
           TIMESTAMP_URL: 'http://timestamp.sectigo.com'
         run: |
           if (-not $env:EV_CERT_BASE64) {
-            Write-Host "EV_CERT_BASE64 non configuré — signature ignorée (dev/staging)"
+            Write-Host "EV_CERT_BASE64 non configure - signature ignoree (dev/staging)"
             exit 0
           }
           $certBytes = [Convert]::FromBase64String($env:EV_CERT_BASE64)
@@ -93,7 +93,7 @@ jobs:
           EV_CERT_BASE64: ${{ secrets.EV_CERT_BASE64 }}
         run: |
           if (-not $env:EV_CERT_BASE64) {
-            Write-Host "EV_CERT_BASE64 non configuré — vérification signature ignorée (dev/staging)"
+            Write-Host "EV_CERT_BASE64 non configure - verification signature ignoree (dev/staging)"
             exit 0
           }
           Get-ChildItem ./publish -Include "*.exe","*.dll" -Recurse | ForEach-Object {
@@ -118,7 +118,7 @@ jobs:
           EV_CERT_PASSWORD: ${{ secrets.EV_CERT_PASSWORD }}
         run: |
           if (-not $env:EV_CERT_BASE64) {
-            Write-Host "EV_CERT_BASE64 non configuré — signature installeur ignorée (dev/staging)"
+            Write-Host "EV_CERT_BASE64 non configure - signature installeur ignoree (dev/staging)"
             exit 0
           }
           $certBytes = [Convert]::FromBase64String($env:EV_CERT_BASE64)
