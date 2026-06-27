@@ -191,10 +191,15 @@ jobs:
       - name: Trigger backend update endpoint
         env:
           BACKEND_WEBHOOK: ${{ secrets.BACKEND_RELEASE_WEBHOOK }}
+          BACKEND_API_KEY: ${{ secrets.BACKEND_API_KEY }}
         run: |
+          if [ -z "$BACKEND_WEBHOOK" ]; then
+            echo "BACKEND_RELEASE_WEBHOOK non configure - notification ignoree (dev/staging)"
+            exit 0
+          fi
           curl -X POST "$BACKEND_WEBHOOK" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.BACKEND_API_KEY }}" \
+            -H "Authorization: Bearer $BACKEND_API_KEY" \
             -d '{
               "version": "${{ needs.build-release.outputs.VERSION }}",
               "channel": "stable",
