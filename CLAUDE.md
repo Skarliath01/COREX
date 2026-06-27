@@ -90,6 +90,8 @@ Cible : Windows 10 22H2 min · x64 uniquement V1 · UAC `requireAdministrator` a
 - ❌ Push direct sur `dev`/`staging`/`main` · Merge commit vers `dev` (squash uniquement)
 - ❌ `.Result` / `.Wait()` en async · `Binding` XAML (→ `x:Bind`) · Code métier en `.xaml.cs`
 - ❌ API ou NuGet sans Context7 d'abord · Code sans PAUL Plan préalable
+- ❌ Commiter du code avant que le user dise explicitement **"lance Superpowers TDD"**
+- ❌ Toucher `WmiQuery.cs` ou tout fichier `Corex.Engine/` sans avoir consulté Context7 d'abord
 - ❌ Tweak 🔴 Expert sans double confirmation · Binaire distribué non signé EV
 - ❌ `Console.WriteLine` en prod · Secret dans le code source · Toucher `pokegenesis`
 - ❌ **Supprimer `dev`, `staging` ou `main`** — jamais, quelle que soit l'action
