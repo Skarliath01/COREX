@@ -5,6 +5,7 @@
 ### Pourquoi c'est non négociable dès V1
 
 Sans signature EV :
+
 - SmartScreen bloque l'installeur avec popup rouge "Windows a protégé votre ordinateur"
 - Defender peut mettre en quarantaine l'exécutable
 - Malwarebytes, ESET, Kaspersky signalent des faux positifs quasi-systématiquement
@@ -25,6 +26,7 @@ Avec signature EV : zéro SmartScreen, zéro faux positif AV sur les builds prop
 ### Processus de signature dans le CI
 
 Voir `cicd.md` — workflow release. En résumé :
+
 1. Certificat stocké en base64 dans GitHub Secrets (`EV_CERT_BASE64`)
 2. Mot de passe dans `EV_CERT_PASSWORD`
 3. Signature via `signtool.exe` avec horodatage RFC 3161 (Sectigo TSA)
@@ -33,12 +35,12 @@ Voir `cicd.md` — workflow release. En résumé :
 
 ### Règles de signature
 
-```
+```powershell
 ✅ Signer : Corex.App.exe, Corex.Native.dll, CorexSetup.exe
 ✅ Toujours avec horodatage (le cert expire mais la signature reste valide)
 ✅ SHA256 pour digest ET contresignature
 ❌ Ne jamais distribuer un binaire non signé, même en bêta privée
-```
+```csharp
 
 ---
 
@@ -57,11 +59,12 @@ Voir `cicd.md` — workflow release. En résumé :
 ### Soumission AV labs (avant chaque release majeure)
 
 Soumettre l'installeur signé aux labs suivants :
-- **Avast** : https://www.avast.com/submit-sample.php
-- **ESET** : https://www.eset.com/int/submit-sample/
-- **Kaspersky** : https://opentip.kaspersky.com/
-- **Malwarebytes** : https://forums.malwarebytes.com/forum/122-false-positives/
-- **Windows Defender** : https://www.microsoft.com/wdsi/filesubmission
+
+- **Avast** : <https://www.avast.com/submit-sample.php>
+- **ESET** : <https://www.eset.com/int/submit-sample/>
+- **Kaspersky** : <https://opentip.kaspersky.com/>
+- **Malwarebytes** : <https://forums.malwarebytes.com/forum/122-false-positives/>
+- **Windows Defender** : <https://www.microsoft.com/wdsi/filesubmission>
 
 Délai moyen de whitelisting : 24–72h selon le lab.
 
@@ -124,10 +127,10 @@ private string GenerateMachineHash()
 
 ### Règle absolue
 
-```
+```text
 Toute modification du système (Registry, services, tâches planifiées, fichiers système)
 DOIT être précédée d'un snapshot. Cette règle n'est pas bypassable, même en mode Expert.
-```
+```text
 
 ### Ce qu'un snapshot contient
 
@@ -154,21 +157,21 @@ public record SystemSnapshot
 
 ### Restauration
 
-```
+```text
 Restauration complète  → toutes les entrées du snapshot, dans l'ordre inverse d'application
 Restauration sélective → une entrée spécifique (Registry key ou service)
 Restauration d'urgence → disponible même si l'UI ne démarre pas (outil CLI séparé)
-```
+```powershell
 
 ### Outil CLI de restauration d'urgence
 
 Un exécutable séparé `CorexRestore.exe` installé dans `Program Files\Altysin\Corex\` :
 
-```
+```powershell
 CorexRestore.exe --list              # Liste tous les snapshots
 CorexRestore.exe --restore <id>      # Restaure un snapshot complet
 CorexRestore.exe --restore-last      # Restaure le plus récent
-```
+```text
 
 Utilisable depuis WinPE ou en mode sans échec si le PC ne démarre plus correctement.
 

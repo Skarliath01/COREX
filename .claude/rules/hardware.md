@@ -6,14 +6,14 @@ paths: ["src/Corex.Core/Hardware/**", "src/Corex.Core/Models/**", "src/Corex.Eng
 
 ## Sources WMI par composant
 
-```
+```text
 CPU     → Win32_Processor         (Manufacturer, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed)
 GPU     → Win32_VideoController   (Name, AdapterRAM, DriverVersion)  +  NVAPI/ADL pour GPU actif
 RAM     → Win32_PhysicalMemory    (Capacity, Speed, Manufacturer, MemoryType)
 Storage → Win32_DiskDrive         + DeviceIoControl (SMART, TBW)
 Réseau  → Win32_NetworkAdapter    (Name, Speed, NetConnectionStatus)
 OS      → Win32_OperatingSystem   + Registry BIOS, SecureBoot, TPM
-```
+```csharp
 
 ## Pattern WMI — toujours disposer les ressources
 
