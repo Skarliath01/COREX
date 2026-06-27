@@ -15,6 +15,8 @@ jobs:
     name: Build Release
     runs-on: windows-latest
     environment: production
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -170,6 +172,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-release
     environment: production
+    permissions: {}
 
     steps:
       - name: Trigger backend update endpoint
