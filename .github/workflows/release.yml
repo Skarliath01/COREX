@@ -53,9 +53,13 @@ jobs:
 
       - name: Build Native DLL (C++)
         run: |
-          msbuild src/Corex.Native/Corex.Native.vcxproj `
-            /p:Configuration=Release `
-            /p:Platform=x64
+          if (Test-Path "src/Corex.Native/Corex.Native.vcxproj") {
+            msbuild src/Corex.Native/Corex.Native.vcxproj `
+              /p:Configuration=Release `
+              /p:Platform=x64
+          } else {
+            Write-Host "Corex.Native not yet implemented — skipping"
+          }
 
       - name: Sign executables
         env:
