@@ -15,6 +15,8 @@ jobs:
     name: Build Release
     runs-on: windows-latest
     environment: production
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -105,7 +107,16 @@ jobs:
           }
         shell: powershell
 
+      - name: Check installer script
+        id: check
+        run: |
+          $has = Test-Path "installer/corex_setup.iss"
+          echo "has_installer=$has" >> $env:GITHUB_OUTPUT
+          Write-Host "Installer script present: $has"
+        shell: powershell
+
       - name: Build Installer (Inno Setup)
+        if: steps.check.outputs.has_installer == 'True'
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
             /DAppVersion=${{ steps.version.outputs.VERSION }} `
@@ -113,6 +124,7 @@ jobs:
         shell: powershell
 
       - name: Sign Installer
+        if: steps.check.outputs.has_installer == 'True'
         env:
           EV_CERT_BASE64: ${{ secrets.EV_CERT_BASE64 }}
           EV_CERT_PASSWORD: ${{ secrets.EV_CERT_PASSWORD }}
@@ -137,18 +149,21 @@ jobs:
 
       - name: Compute SHA256
         id: sha256
+        if: steps.check.outputs.has_installer == 'True'
         run: |
           $hash = (Get-FileHash "installer/Output/CorexSetup-${{ steps.version.outputs.VERSION }}.exe" -Algorithm SHA256).Hash
           echo "HASH=$hash" >> $env:GITHUB_OUTPUT
         shell: powershell
 
       - name: Upload installer artifact
+        if: steps.check.outputs.has_installer == 'True'
         uses: actions/upload-artifact@v4
         with:
           name: corex-installer-${{ steps.version.outputs.VERSION }}
           path: installer/Output/*.exe
 
       - name: Create GitHub Release
+        if: steps.check.outputs.has_installer == 'True'
         uses: softprops/action-gh-release@v2
         with:
           files: installer/Output/*.exe
@@ -170,15 +185,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-release
     environment: production
+    permissions: {}
 
     steps:
       - name: Trigger backend update endpoint
         env:
           BACKEND_WEBHOOK: ${{ secrets.BACKEND_RELEASE_WEBHOOK }}
+          BACKEND_API_KEY: ${{ secrets.BACKEND_API_KEY }}
         run: |
+          if [ -z "$BACKEND_WEBHOOK" ]; then
+            echo "BACKEND_RELEASE_WEBHOOK non configure - notification ignoree (dev/staging)"
+            exit 0
+          fi
           curl -X POST "$BACKEND_WEBHOOK" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.BACKEND_API_KEY }}" \
+            -H "Authorization: Bearer $BACKEND_API_KEY" \
             -d '{
               "version": "${{ needs.build-release.outputs.VERSION }}",
               "channel": "stable",
