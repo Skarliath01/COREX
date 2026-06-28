@@ -4,11 +4,11 @@
 
 ### Les 3 branches permanentes
 
-```
+```text
 main        ← Production — code déployé aux utilisateurs finaux
 staging     ← Recette — validation avant mise en prod
 dev         ← Intégration — toutes les features mergées ici en premier
-```
+```text
 
 **Règle absolue : aucun push direct sur `main`, `staging` ou `dev`. Tout passe par PR.**
 
@@ -22,7 +22,7 @@ dev         ← Intégration — toutes les features mergées ici en premier
 
 ### Flow de développement — ordre obligatoire
 
-```
+```text
 1. Créer la branche depuis dev
          │
          ▼
@@ -36,7 +36,7 @@ dev         ← Intégration — toutes les features mergées ici en premier
          │
          ▼ (PR + merge commit quand staging est validé)
         main   ←── production, déclenchement release CI/CD
-```
+```bash
 
 **Chaque étape est une PR distincte. On ne saute jamais une étape.**
 
@@ -61,7 +61,7 @@ git checkout -b hotfix/license-validation-null-ref
 
 ### Nommage des branches
 
-```
+```text
 feature/m1-hardware-detection       ← nouvelle fonctionnalité
 feature/m2-privacy-tweaks
 feature/m4-uninstaller-core
@@ -71,13 +71,14 @@ fix/wmi-timeout-handling
 
 hotfix/license-null-crash           ← correction bug critique en prod
 hotfix/smartscreen-false-positive
-```
+```bash
 
 ---
 
 ### Merge Rules
 
-#### feature/* ou fix/* → dev
+#### feature/*ou fix/* → dev
+
 - **Squash merge obligatoire** — tous les commits de travail condensés en 1 commit propre
 - Message du squash commit = Conventional Commit (`feat(m1): add GPU detection via WMI`)
 - CI doit être vert avant merge
@@ -89,6 +90,7 @@ hotfix/smartscreen-false-positive
 ```
 
 #### dev → staging
+
 - **Merge commit** (pas de squash — on veut voir les features individuelles dans staging)
 - Déclenché manuellement quand dev est jugée stable (pas de merge auto)
 - Déclenche le CI staging (build + tests d'intégration)
@@ -101,6 +103,7 @@ git push origin staging
 ```
 
 #### staging → main
+
 - **Merge commit** (traçabilité complète)
 - Uniquement après validation QA manuelle complète sur staging
 - Déclenche automatiquement le workflow release CI/CD (build signé + installeur + GitHub Release)
@@ -119,7 +122,7 @@ git push origin main --tags
 
 Un hotfix corrige un bug bloquant découvert en production. Il doit bypasser le cycle normal tout en restant tracé.
 
-```
+```text
 hotfix/nom-du-bug  (créée depuis dev)
          │
          ▼ squash merge
@@ -130,7 +133,7 @@ hotfix/nom-du-bug  (créée depuis dev)
          │
          ▼ merge commit immédiat si staging ok
         main   ←── patch release (v1.0.1)
-```
+```text
 
 **Même un hotfix part de `dev`.** La différence c'est la vitesse de promotion : on ne fait pas de retests complets sur staging, uniquement le scénario du bug fixé.
 
@@ -141,6 +144,7 @@ hotfix/nom-du-bug  (créée depuis dev)
 À configurer dans **Settings → Branches → Branch protection rules** pour chaque branche :
 
 **`main` :**
+
 - [x] Require a pull request before merging
 - [x] Require status checks to pass (CI workflow)
 - [x] Do not allow bypassing the above settings
@@ -148,11 +152,13 @@ hotfix/nom-du-bug  (créée depuis dev)
 - [x] Require linear history
 
 **`staging` :**
+
 - [x] Require a pull request before merging
 - [x] Require status checks to pass
 - [x] Do not allow bypassing
 
 **`dev` :**
+
 - [x] Require a pull request before merging
 - [x] Require status checks to pass (CI build + tests)
 
@@ -160,7 +166,7 @@ hotfix/nom-du-bug  (créée depuis dev)
 
 ### Résumé visuel complet
 
-```
+```text
 [feature/m1]  →  squash merge  →  [dev]
 [fix/crash]   →  squash merge  →  [dev]
                                     │
@@ -173,17 +179,17 @@ hotfix/nom-du-bug  (créée depuis dev)
                                     │ merge commit + tag
                                     ▼
                                  [main]  →  CI release → installeur signé → GitHub Release
-```
+```text
 
 ### Messages de commit — Conventional Commits
 
-```
+```text
 <type>(<scope>): <description courte>
 
 [body optionnel]
 
 [footer optionnel]
-```
+```text
 
 **Types autorisés :**
 
@@ -202,17 +208,18 @@ hotfix/nom-du-bug  (créée depuis dev)
 
 **Exemples corrects :**
 
-```
+```text
 feat(m1): add GPU VRAM detection via WMI
 fix(m2): disable SysMain tweak not persisting after reboot
 feat(m4): implement orphan registry key cleanup post-uninstall
 test(m1): add unit tests for AMD GPU detection path
 ci: add EV signing step to release workflow
 fix(m10): snapshot restore failing when registry key missing
-```
+```text
 
 **Interdits :**
-```
+
+```text
 # Trop vague
 fix: bug fix
 update: stuff
@@ -220,12 +227,11 @@ wip: working on it
 
 # Pas de scope
 feat: added hardware detection
-```
+```csharp
 
 ---
 
-## Conventions C#
-
+## Conventions C
 ### Naming
 
 ```csharp
